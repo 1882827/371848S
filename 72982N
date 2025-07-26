@@ -52,7 +52,7 @@ print("UsuÃ¡rio autorizado:", LocalPlayer.Name)
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/MlFrvWM/BBLT81/main/BL81827TC", true))()
 
-local window = library:AddWindow("1987 Private", {
+local window = library:AddWindow("Sad Private V3", {
     main_color = Color3.fromRGB(9, 12, 217),
     min_size = Vector2.new(740, 500),
     can_resize = false,
