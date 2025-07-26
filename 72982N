@@ -640,6 +640,90 @@ tabFastRebirths:AddButton("Full Optimization", function()
     })
 end)
 
+local tabFarme = window:AddTab("Farm")
+
+tabFarme:AddButton("Gamepass AutoLift", function()
+    local gamepassFolder = game:GetService("ReplicatedStorage").gamepassIds
+    local player = game:GetService("Players").LocalPlayer
+    for _, gamepass in pairs(gamepassFolder:GetChildren()) do
+        local value = Instance.new("IntValue")
+        value.Name = gamepass.Name
+        value.Value = gamepass.Value
+        value.Parent = player.ownedGamepasses
+    end
+end, "Desbloqueia a gamepass de AutoLift gratis")
+
+tabFarme:AddSwitch("Auto Weight", function(Value)
+    _G.AutoWeight = Value
+    
+    if Value then
+        local weightTool = game.Players.LocalPlayer.Backpack:FindFirstChild("Weight")
+        if weightTool then
+            game.Players.LocalPlayer.Character.Humanoid:EquipTool(weightTool)
+        end
+    else
+        local character = game.Players.LocalPlayer.Character
+        local equipped = character:FindFirstChild("Weight")
+        if equipped then
+            equipped.Parent = game.Players.LocalPlayer.Backpack
+        end
+    end
+    
+    task.spawn(function()
+        while _G.AutoWeight do
+            if not _G.AutoWeight then break end
+            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+            task.wait(0.1)
+        end
+    end)
+end, "Levanta pesas automaticamente")
+
+local autoEatEnabled = false
+
+local function eatProteinEgg()
+    local player = game.Players.LocalPlayer
+    local backpack = player:WaitForChild("Backpack")
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    local egg = backpack:FindFirstChild("Protein Egg")
+    if egg then
+        egg.Parent = character
+        pcall(function()
+            egg:Activate()
+        end)
+    end
+end
+
+task.spawn(function()
+    while true do
+        if autoEatEnabled then
+            eatProteinEgg()
+            task.wait(1800)
+        else
+            task.wait(1)
+        end
+    end
+end)
+
+tabFarme:AddSwitch("Auto Eat Egg", function(state)
+    autoEatEnabled = state
+end)
+
+tabFarme:AddLabel("Teleport").TextSize = 25
+
+tabFarme:AddButton("Muscle King Gym", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoidRootPart.CFrame = CFrame.new(-8646, 17, -5738)
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Teletransporte",
+        Text = "Teleported",
+        Duration = 0
+    })
+end)
+
 local tabRock = window:AddTab("Rock")
 
 function gettool()
@@ -1119,7 +1203,7 @@ end)
 local deathringLabel = Killing:AddLabel("Kill Aura")
 deathringLabel.TextSize = 20
 
-Killing:AddTextBox("Range (1-140)", function(text)
+Killing:AddTextBox("Size (1-140)", function(text)
     local range = tonumber(text)
     if range then
         _G.deathRingRange = math.clamp(range, 1, 140)
@@ -1154,7 +1238,7 @@ local deathRingSwitch = Killing:AddSwitch("Death Ring", function(bool)
 end)
 deathRingSwitch:Set(false)
 
-local button = Killing:AddButton("Remove Attack Animations", function()
+local button = Killing:AddButton("Remove Punch Animation", function()
     local blockedAnimations = {
         ["rbxassetid://3638729053"] = true,
         ["rbxassetid://3638767427"] = true,
@@ -1311,6 +1395,39 @@ local button = Killing:AddButton("Remove Attack Animations", function()
             end)
         end)
     end
+end)
+
+function RecoveryPunch()
+    if _G.AnimBlockConnection then
+        _G.AnimBlockConnection:Disconnect()
+        _G.AnimBlockConnection = nil
+    end
+    if _G.AnimMonitorConnection then
+        _G.AnimMonitorConnection:Disconnect()
+        _G.AnimMonitorConnection = nil
+    end
+    if _G.ToolConnections then
+        for _, conn in pairs(_G.ToolConnections) do
+            if conn then conn:Disconnect() end
+        end
+        _G.ToolConnections = nil
+    end
+    if _G.BackpackAddedConnection then
+        _G.BackpackAddedConnection:Disconnect()
+        _G.BackpackAddedConnection = nil
+    end
+    if _G.CharacterToolAddedConnection then
+        _G.CharacterToolAddedConnection:Disconnect()
+        _G.CharacterToolAddedConnection = nil
+    end
+    if _G.CharacterAddedConnection then
+        _G.CharacterAddedConnection:Disconnect()
+        _G.CharacterAddedConnection = nil
+    end
+end
+
+Killing:AddButton("Recovery Punch Animation", function()
+    RecoveryPunch()
 end)
 
 Killing:AddSwitch("Auto Equip Punch", function(state)
