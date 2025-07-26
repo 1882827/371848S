@@ -54,7 +54,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/MlFrv
 
 local window = library:AddWindow("Sad Private V3", {
     main_color = Color3.fromRGB(9, 12, 217),
-    min_size = Vector2.new(740, 500),
+    min_size = Vector2.new(685, 550),
     can_resize = false,
 })
 
