@@ -208,7 +208,7 @@ tabFastStrenght:AddSwitch("Auto Eat Egg", function(state)
     autoEatEnabled = state
 end)
 
-local dropdown = Killing:AddDropdown("Select Pet", function(text)
+local dropdown = tabFastStrenght:AddDropdown("Select Pet", function(text)
     local petsFolder = game.Players.LocalPlayer.petsFolder
     for _, folder in pairs(petsFolder:GetChildren()) do
         if folder:IsA("Folder") then
@@ -1797,7 +1797,7 @@ tabMisc:AddSwitch("Full Walk on Water", function(bool)
     end
 end)
 
-local dropdown = Killing:AddDropdown("Select Pet", function(text)
+local dropdown = tabMisc:AddDropdown("Select Pet", function(text)
     local petsFolder = game.Players.LocalPlayer.petsFolder
     for _, folder in pairs(petsFolder:GetChildren()) do
         if folder:IsA("Folder") then
