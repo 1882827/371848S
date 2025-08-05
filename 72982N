@@ -236,7 +236,7 @@ end)
 
 dropdown:Add("Swift Samurai")
 
-fastfarmTab:AddButton("Anti Lag", function()
+tabFastStrenght:AddButton("Anti Lag", function()
     local player = game.Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
     local lighting = game:GetService("Lighting")
@@ -515,7 +515,7 @@ tabFastRebirths:AddSwitch("Auto Eat Egg", function(state)
     autoEatEnabled = state
 end)
 
-fastfarmTab:AddButton("Anti Lag", function()
+tabFastRebirths:AddButton("Anti Lag", function()
     local player = game.Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
     local lighting = game:GetService("Lighting")
