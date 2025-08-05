@@ -236,117 +236,77 @@ end)
 
 dropdown:Add("Swift Samurai")
 
-tabFastStrenght:AddButton("Remove Textures", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("Decal") or v:IsA("Texture") then
-            v.Transparency = 1
-        end
-    end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Textures removed!",
-        Duration = 5
-    })
-end)
- 
-tabFastStrenght:AddButton("Reduce Graphics", function()
-    settings().Rendering.QualityLevel = 1
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Graphics reduced!",
-        Duration = 5
-    })
-end)
- 
-tabFastStrenght:AddButton("Disable Effects", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
-            v.Enabled = false
-        end
-    end
- 
+fastfarmTab:AddButton("Anti Lag", function()
+    local player = game.Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
     local lighting = game:GetService("Lighting")
-    for _, v in pairs(lighting:GetChildren()) do
-        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
-            v.Enabled = false
+
+    for _, gui in pairs(playerGui:GetChildren()) do
+        if gui:IsA("ScreenGui") then
+            gui:Destroy()
         end
     end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Effects disabled!",
-        Duration = 5
-    })
-end)
- 
-tabFastStrenght:AddButton("Simplify Materials", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("BasePart") and not v:IsA("MeshPart") then
-            v.Material = Enum.Material.SmoothPlastic
-            if v.Parent and (v.Parent:FindFirstChild("Humanoid") or v.Parent.Parent:FindFirstChild("Humanoid")) then
-            else
-                v.Reflectance = 0
+
+    local function darkenSky()
+        for _, v in pairs(lighting:GetChildren()) do
+            if v:IsA("Sky") then
+                v:Destroy()
+            end
+        end
+
+        local darkSky = Instance.new("Sky")
+        darkSky.Name = "DarkSky"
+        darkSky.SkyboxBk = "rbxassetid://0"
+        darkSky.SkyboxDn = "rbxassetid://0"
+        darkSky.SkyboxFt = "rbxassetid://0"
+        darkSky.SkyboxLf = "rbxassetid://0"
+        darkSky.SkyboxRt = "rbxassetid://0"
+        darkSky.SkyboxUp = "rbxassetid://0"
+        darkSky.Parent = lighting
+
+        lighting.Brightness = 0
+        lighting.ClockTime = 0
+        lighting.TimeOfDay = "00:00:00"
+        lighting.OutdoorAmbient = Color3.new(0, 0, 0)
+        lighting.Ambient = Color3.new(0, 0, 0)
+        lighting.FogColor = Color3.new(0, 0, 0)
+        lighting.FogEnd = 100
+
+        task.spawn(function()
+            while true do
+                wait(5)
+                if not lighting:FindFirstChild("DarkSky") then
+                    darkSky:Clone().Parent = lighting
+                end
+                lighting.Brightness = 0
+                lighting.ClockTime = 0
+                lighting.OutdoorAmbient = Color3.new(0, 0, 0)
+                lighting.Ambient = Color3.new(0, 0, 0)
+                lighting.FogColor = Color3.new(0, 0, 0)
+                lighting.FogEnd = 100
+            end
+        end)
+    end
+
+    local function removeParticleEffects()
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("ParticleEmitter") then
+                obj:Destroy()
             end
         end
     end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Materials simplified!",
-        Duration = 5
-    })
-end)
- 
-tabFastStrenght:AddButton("Remove Fog", function()
-    local lighting = game:GetService("Lighting")
-    lighting.FogEnd = 9e9
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Fog removed!",
-        Duration = 5
-    })
-end)
- 
-tabFastStrenght:AddButton("Full Optimization", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
-            v.Enabled = false
-        end
-    end
- 
-    local lighting = game:GetService("Lighting")
-    lighting.GlobalShadows = false
-    lighting.FogEnd = 9e9
-    lighting.Brightness = 0
- 
-    settings().Rendering.QualityLevel = 1
- 
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("Decal") or v:IsA("Texture") then
-            v.Transparency = 1
-        elseif v:IsA("BasePart") and not v:IsA("MeshPart") then
-            v.Material = Enum.Material.SmoothPlastic
-            if v.Parent and (v.Parent:FindFirstChild("Humanoid") or v.Parent.Parent:FindFirstChild("Humanoid")) then
-            else
-                v.Reflectance = 0
+
+    local function removeLightSources()
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("PointLight") or obj:IsA("SpotLight") or obj:IsA("SurfaceLight") then
+                obj:Destroy()
             end
         end
     end
- 
-    for _, v in pairs(lighting:GetChildren()) do
-        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
-            v.Enabled = false
-        end
-    end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Full optimization applied!",
-        Duration = 5
-    })
+
+    removeParticleEffects()
+    removeLightSources()
+    darkenSky()
 end)
 
 local tabFastRebirths = window:AddTab("Fast Rebirths")
@@ -555,117 +515,77 @@ tabFastRebirths:AddSwitch("Auto Eat Egg", function(state)
     autoEatEnabled = state
 end)
 
-tabFastRebirths:AddButton("Remove Textures", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("Decal") or v:IsA("Texture") then
-            v.Transparency = 1
-        end
-    end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Textures removed!",
-        Duration = 5
-    })
-end)
- 
-tabFastRebirths:AddButton("Reduce Graphics", function()
-    settings().Rendering.QualityLevel = 1
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Graphics reduced!",
-        Duration = 5
-    })
-end)
- 
-tabFastRebirths:AddButton("Disable Effects", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
-            v.Enabled = false
-        end
-    end
- 
+fastfarmTab:AddButton("Anti Lag", function()
+    local player = game.Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
     local lighting = game:GetService("Lighting")
-    for _, v in pairs(lighting:GetChildren()) do
-        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
-            v.Enabled = false
+
+    for _, gui in pairs(playerGui:GetChildren()) do
+        if gui:IsA("ScreenGui") then
+            gui:Destroy()
         end
     end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Effects disabled!",
-        Duration = 5
-    })
-end)
- 
-tabFastRebirths:AddButton("Simplify Materials", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("BasePart") and not v:IsA("MeshPart") then
-            v.Material = Enum.Material.SmoothPlastic
-            if v.Parent and (v.Parent:FindFirstChild("Humanoid") or v.Parent.Parent:FindFirstChild("Humanoid")) then
-            else
-                v.Reflectance = 0
+
+    local function darkenSky()
+        for _, v in pairs(lighting:GetChildren()) do
+            if v:IsA("Sky") then
+                v:Destroy()
+            end
+        end
+
+        local darkSky = Instance.new("Sky")
+        darkSky.Name = "DarkSky"
+        darkSky.SkyboxBk = "rbxassetid://0"
+        darkSky.SkyboxDn = "rbxassetid://0"
+        darkSky.SkyboxFt = "rbxassetid://0"
+        darkSky.SkyboxLf = "rbxassetid://0"
+        darkSky.SkyboxRt = "rbxassetid://0"
+        darkSky.SkyboxUp = "rbxassetid://0"
+        darkSky.Parent = lighting
+
+        lighting.Brightness = 0
+        lighting.ClockTime = 0
+        lighting.TimeOfDay = "00:00:00"
+        lighting.OutdoorAmbient = Color3.new(0, 0, 0)
+        lighting.Ambient = Color3.new(0, 0, 0)
+        lighting.FogColor = Color3.new(0, 0, 0)
+        lighting.FogEnd = 100
+
+        task.spawn(function()
+            while true do
+                wait(5)
+                if not lighting:FindFirstChild("DarkSky") then
+                    darkSky:Clone().Parent = lighting
+                end
+                lighting.Brightness = 0
+                lighting.ClockTime = 0
+                lighting.OutdoorAmbient = Color3.new(0, 0, 0)
+                lighting.Ambient = Color3.new(0, 0, 0)
+                lighting.FogColor = Color3.new(0, 0, 0)
+                lighting.FogEnd = 100
+            end
+        end)
+    end
+
+    local function removeParticleEffects()
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("ParticleEmitter") then
+                obj:Destroy()
             end
         end
     end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Materials simplified!",
-        Duration = 5
-    })
-end)
- 
-tabFastRebirths:AddButton("Remove Fog", function()
-    local lighting = game:GetService("Lighting")
-    lighting.FogEnd = 9e9
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Fog removed!",
-        Duration = 5
-    })
-end)
- 
-tabFastRebirths:AddButton("Full Optimization", function()
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
-            v.Enabled = false
-        end
-    end
- 
-    local lighting = game:GetService("Lighting")
-    lighting.GlobalShadows = false
-    lighting.FogEnd = 9e9
-    lighting.Brightness = 0
- 
-    settings().Rendering.QualityLevel = 1
- 
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("Decal") or v:IsA("Texture") then
-            v.Transparency = 1
-        elseif v:IsA("BasePart") and not v:IsA("MeshPart") then
-            v.Material = Enum.Material.SmoothPlastic
-            if v.Parent and (v.Parent:FindFirstChild("Humanoid") or v.Parent.Parent:FindFirstChild("Humanoid")) then
-            else
-                v.Reflectance = 0
+
+    local function removeLightSources()
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("PointLight") or obj:IsA("SpotLight") or obj:IsA("SurfaceLight") then
+                obj:Destroy()
             end
         end
     end
- 
-    for _, v in pairs(lighting:GetChildren()) do
-        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
-            v.Enabled = false
-        end
-    end
- 
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Performance",
-        Text = "Full optimization applied!",
-        Duration = 5
-    })
+
+    removeParticleEffects()
+    removeLightSources()
+    darkenSky()
 end)
 
 local tabFarme = window:AddTab("Farm")
