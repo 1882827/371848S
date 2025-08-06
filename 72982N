@@ -1860,7 +1860,159 @@ tabpets:AddSwitch("Auto Open Aura", function(bool)
     end
 end)
 
-local tabLookDura = window:AddTab("Stats")
+local statsTab = window:AddTab("Stats")
+
+local player = game.Players.LocalPlayer
+local leaderstats = player:WaitForChild("leaderstats")
+local strengthStat = leaderstats:WaitForChild("Strength")
+local rebirthsStat = leaderstats:WaitForChild("Rebirths")
+local durabilityStat = player:WaitForChild("Durability")
+local killsStat = leaderstats:WaitForChild("Kills")
+local agilityStat = player:WaitForChild("Agility")
+local evilKarmaStat = player:WaitForChild("evilKarma")
+local goodKarmaStat = player:WaitForChild("goodKarma")
+local brawlsStat = leaderstats:WaitForChild("Brawls")
+
+local function formatNumber(number)
+    local isNegative = number < 0
+    number = math.abs(number)
+
+    if number >= 1e15 then
+        return (isNegative and "-" or "") .. string.format("%.2fQa", number / 1e15)
+    elseif number >= 1e12 then
+        return (isNegative and "-" or "") .. string.format("%.2fT", number / 1e12)
+    elseif number >= 1e9 then
+        return (isNegative and "-" or "") .. string.format("%.2fB", number / 1e9)
+    elseif number >= 1e6 then
+        return (isNegative and "-" or "") .. string.format("%.2fM", number / 1e6)
+    elseif number >= 1e3 then
+        return (isNegative and "-" or "") .. string.format("%.2fK", number / 1e3)
+    else
+        return (isNegative and "-" or "") .. string.format("%.2f", number)
+    end
+end
+
+local timeLabel = statsTab:AddLabel("Time:")
+timeLabel.TextSize = 24
+
+local stopwatchLabel = statsTab:AddLabel("0d 0h 0m 0s")
+stopwatchLabel.TextSize = 20
+
+local projectedStrengthLabel = statsTab:AddLabel("Projected Strength: 0 /Hour | 0 /Day")
+projectedStrengthLabel.TextSize = 20
+
+local projectedDurabilityLabel = statsTab:AddLabel("Projected Durability: 0 /Hour | 0 /Day")
+projectedDurabilityLabel.TextSize = 20
+
+local projectedRebirthsLabel = statsTab:AddLabel("Projected Rebirths: 0 /Hour | 0 /Day")
+projectedRebirthsLabel.TextSize = 20
+
+statsTab:AddLabel("").TextSize = 10
+
+local statsLabel = statsTab:AddLabel("Stats:")
+statsLabel.TextSize = 24
+
+local strengthLabel = statsTab:AddLabel("Strength: 0 | Gained: 0")
+strengthLabel.TextSize = 20
+
+local durabilityLabel = statsTab:AddLabel("Durability: 0 | Gained: 0")
+durabilityLabel.TextSize = 20
+
+local rebirthsLabel = statsTab:AddLabel("Rebirths: 0 | Gained: 0")
+rebirthsLabel.TextSize = 20
+
+local killsLabel = statsTab:AddLabel("Kills: 0 | Gained: 0")
+killsLabel.TextSize = 20
+
+local agilityLabel = statsTab:AddLabel("Agility: 0 | Gained: 0")
+agilityLabel.TextSize = 20
+
+local evilKarmaLabel = statsTab:AddLabel("Evil Karma: 0 | Gained: 0")
+evilKarmaLabel.TextSize = 20
+
+local goodKarmaLabel = statsTab:AddLabel("Good Karma: 0 | Gained: 0")
+goodKarmaLabel.TextSize = 20
+
+local brawlsLabel = statsTab:AddLabel("Brawls: 0 | Gained: 0")
+brawlsLabel.TextSize = 20
+
+local startTime = tick()
+local initialStrength = strengthStat.Value
+local initialDurability = durabilityStat.Value
+local initialRebirths = rebirthsStat.Value
+local initialKills = killsStat.Value
+local initialAgility = agilityStat.Value
+local initialEvilKarma = evilKarmaStat.Value
+local initialGoodKarma = goodKarmaStat.Value
+local initialBrawls = brawlsStat.Value
+
+task.spawn(function()
+    local lastUpdate = 0
+
+    while true do
+        local currentTime = tick()
+        local elapsedTime = currentTime - startTime
+        local days = math.floor(elapsedTime / (24 * 3600))
+        local hours = math.floor((elapsedTime % (24 * 3600)) / 3600)
+        local minutes = math.floor((elapsedTime % 3600) / 60)
+        local seconds = math.floor(elapsedTime % 60)
+
+        stopwatchLabel.Text = string.format("%dd %dh %dm %ds", days, hours, minutes, seconds)
+
+        local currentStrength = strengthStat.Value
+        local currentRebirths = rebirthsStat.Value
+        local currentDurability = durabilityStat.Value
+        local currentKills = killsStat.Value
+        local currentAgility = agilityStat.Value
+        local currentEvilKarma = evilKarmaStat.Value
+        local currentGoodKarma = goodKarmaStat.Value
+        local currentBrawls = brawlsStat.Value
+
+        local sessionStrengthDelta = currentStrength - initialStrength
+        local sessionDurabilityDelta = currentDurability - initialDurability
+        local sessionRebirthsDelta = currentRebirths - initialRebirths
+        local sessionKillsDelta = currentKills - initialKills
+        local sessionAgilityDelta = currentAgility - initialAgility
+        local sessionEvilKarmaDelta = currentEvilKarma - initialEvilKarma
+        local sessionGoodKarmaDelta = currentGoodKarma - initialGoodKarma
+        local sessionBrawlsDelta = currentBrawls - initialBrawls
+
+        strengthLabel.Text = "Strength: " .. formatNumber(currentStrength) .. " | Gained: " .. formatNumber(sessionStrengthDelta)
+        durabilityLabel.Text = "Durability: " .. formatNumber(currentDurability) .. " | Gained: " .. formatNumber(sessionDurabilityDelta)
+        rebirthsLabel.Text = "Rebirths: " .. formatNumber(currentRebirths) .. " | Gained: " .. formatNumber(sessionRebirthsDelta)
+        agilityLabel.Text = "Agility: " .. formatNumber(currentAgility) .. " | Gained: " .. formatNumber(sessionAgilityDelta)
+        killsLabel.Text = "Kills: " .. formatNumber(currentKills) .. " | Gained: " .. formatNumber(sessionKillsDelta)
+        evilKarmaLabel.Text = "Evil Karma: " .. formatNumber(currentEvilKarma) .. " | Gained: " .. formatNumber(sessionEvilKarmaDelta)
+        goodKarmaLabel.Text = "Good Karma: " .. formatNumber(currentGoodKarma) .. " | Gained: " .. formatNumber(sessionGoodKarmaDelta)
+        brawlsLabel.Text = "Brawls: " .. formatNumber(currentBrawls) .. " | Gained: " .. formatNumber(sessionBrawlsDelta)
+
+        if currentTime - lastUpdate >= 6 then
+            lastUpdate = currentTime
+
+            local rebirthsPerSecond = sessionRebirthsDelta / elapsedTime
+            local strengthPerSecond = sessionStrengthDelta / elapsedTime
+            local durabilityPerSecond = sessionDurabilityDelta / elapsedTime
+
+            local secondsPerHour = 3600
+            local secondsPerDay = 86400
+
+            local rebirthsPerHour = math.floor(rebirthsPerSecond * secondsPerHour)
+            local strengthPerHour = math.floor(strengthPerSecond * secondsPerHour)
+            local durabilityPerHour = math.floor(durabilityPerSecond * secondsPerHour)
+
+            local projectedRebirths = math.floor(rebirthsPerSecond * secondsPerDay)
+            local projectedStrength = math.floor(strengthPerSecond * secondsPerDay)
+            local projectedDurability = math.floor(durabilityPerSecond * secondsPerDay)
+
+            projectedStrengthLabel.Text = "Strength Pace: " .. formatNumber(strengthPerHour) .. "/Hour | " .. formatNumber(projectedStrength) .. "/Day"
+            projectedDurabilityLabel.Text = "Durability Pace: " .. formatNumber(durabilityPerHour) .. "/Hour | " .. formatNumber(projectedDurability) .. "/Day"
+            projectedRebirthsLabel.Text = "Rebirth Pace: " .. formatNumber(rebirthsPerHour) .. "/Hour | " .. formatNumber(projectedRebirths) .. "/Day"
+        end
+        task.wait(0.05)
+    end
+end)
+
+local tabLookDura = window:AddTab("View Stats")
 
 tabLookDura:AddLabel("View Stats").TextSize = 20
 
