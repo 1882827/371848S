@@ -71,7 +71,7 @@ spawn(function()
     setFontRecursive(window.gui, Enum.Font.GothamSemibold)
 end)
 
-local tabFastStrenght = window:AddTab("Fast Strenght")
+local tabFastStrenght = window:AddTab("Fast Strength")
 
 tabFastStrenght:AddTextBox("Multiplier Rep", function(v)
           setws = v
@@ -118,7 +118,7 @@ tabFastStrenght:AddTextBox("Multiplier Rep", function(v)
         end
     end
      
-    local switch = tabFastStrenght:AddSwitch("Fast Strenght", function(Value)
+    local switch = tabFastStrenght:AddSwitch("Fast Strength", function(Value)
          isRunning = Value
             if Value then
                 task.spawn(startStrengthAutomation)
@@ -425,7 +425,16 @@ tabFastRebirths:AddSwitch("Fast Rebirth", function(bool)
             end
         end)
 
-        tabFastRebirths:AddLabel("Complements").TextSize = 25
+local frameToggle = tabFastRebirths:AddSwitch("Hide All Frames", function(bool)
+    local rSto = game:GetService("ReplicatedStorage")
+    for _, obj in pairs(rSto:GetChildren()) do
+        if obj.Name:match("Frame$") then
+            obj.Visible = not bool
+        end
+    end
+end)
+
+tabFastRebirths:AddLabel("Complements").TextSize = 25
 
 local VIM = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
