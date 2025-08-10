@@ -1959,7 +1959,7 @@ if player and player:FindFirstChild("leaderstats") and player.leaderstats:FindFi
 end
 updateDisplay()
 
-local folderDur = tabCal:AddFolder("Durabilidade Calculator")
+local folderDur = tabCal:AddFolder("Hit Calculator")
 local lblTitleHits = folderDur:AddLabel("Hit Calculations")
 lblTitleHits.TextSize = 30
 
